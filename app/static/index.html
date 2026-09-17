@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JSON 数据脱敏工作台</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">🛡️</span>
+      <div>
+        <h1>JSON 数据脱敏工作台</h1>
+        <p class="subtitle">删除 · 掩码 · 带盐哈希 · 稳定编号 — 规则按优先级匹配，原始数据不出本机</p>
+      </div>
+    </div>
+    <div class="salt-status" id="saltStatus" title="MASKING_HASH_SALT">盐值：检测中…</div>
+  </header>
+
+  <main class="layout">
+    <!-- 左列：输入 + 规则 -->
+    <section class="col col-left">
+      <div class="card">
+        <div class="card-head">
+          <h2>① 原始 JSON</h2>
+          <div class="row-actions">
+            <button class="btn btn-ghost" id="btnSample" type="button">载入示例</button>
+            <button class="btn btn-ghost" id="btnFormat" type="button">格式化</button>
+          </div>
+        </div>
+        <textarea id="jsonInput" class="code-input" spellcheck="false"
+          placeholder='{"user": {"name": "张三", "id_card": "110101199001011234"}}'></textarea>
+        <div class="hint error-hint" id="jsonError"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>② 脱敏规则</h2>
+          <div class="row-actions">
+            <button class="btn btn-primary" id="btnAddRule" type="button">+ 新增规则</button>
+          </div>
+        </div>
+        <div id="rulesList" class="rules-list"></div>
+        <div class="rule-legend">
+          数字越小优先级越高；同一路径仅执行首条命中规则；父节点被删除/替换后子路径不再处理。
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>③ 规则模板</h2></div>
+        <div class="template-bar">
+          <input id="tplName" class="input" type="text" placeholder="模板名称" maxlength="100" />
+          <input id="tplDesc" class="input" type="text" placeholder="说明（可选）" maxlength="500" />
+          <button class="btn btn-primary" id="btnSaveTpl" type="button">保存当前规则为模板</button>
+        </div>
+        <div id="tplList" class="tpl-list"></div>
+      </div>
+    </section>
+
+    <!-- 右列：预览 + 审计 -->
+    <section class="col col-right">
+      <div class="card">
+        <div class="card-head">
+          <h2>④ 预览</h2>
+          <div class="row-actions">
+            <button class="btn btn-primary" id="btnPreview" type="button">运行预览</button>
+            <button class="btn" id="btnExportJson" type="button" disabled>导出脱敏 JSON</button>
+            <button class="btn" id="btnExportAudit" type="button" disabled>导出审计清单</button>
+          </div>
+        </div>
+        <div id="summaryBar" class="summary-bar hidden"></div>
+        <div class="tree-grid">
+          <div class="tree-pane">
+            <h3>原值</h3>
+            <div id="origTree" class="tree"></div>
+          </div>
+          <div class="tree-pane">
+            <h3>脱敏结果</h3>
+            <div id="resultTree" class="tree"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>⑤ 命中 / 未命中明细</h2>
+          <div class="filters">
+            <label><input type="checkbox" id="fOnlyHit" /> 仅看命中路径</label>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="reportTable">
+            <thead>
+              <tr>
+                <th>路径</th><th>状态</th><th>命中规则</th><th>原值（截断）</th><th>结果（截断）</th><th>其他规则</th>
+              </tr>
+            </thead>
+            <tbody id="reportBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

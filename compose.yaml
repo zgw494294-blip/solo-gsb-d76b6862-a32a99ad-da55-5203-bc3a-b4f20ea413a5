@@ -1,0 +1,28 @@
+# 一键启动：docker compose up --build
+services:
+  masking-workbench:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: json-masking-workbench:latest
+    container_name: json-masking-workbench
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      # 必填（仅当使用 hash 规则时）：请改成你自己的随机盐，例如：
+      #   openssl rand -hex 32
+      MASKING_HASH_SALT: "${MASKING_HASH_SALT:-please-change-this-dev-salt}"
+      SQLITE_PATH: "/data/masking.db"
+      MAX_BODY_BYTES: "${MAX_BODY_BYTES:-10485760}"
+      PORT: "8000"
+    volumes:
+      - masking_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  masking_data:
