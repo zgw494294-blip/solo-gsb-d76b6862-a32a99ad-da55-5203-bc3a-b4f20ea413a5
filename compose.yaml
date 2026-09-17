@@ -1,0 +1,20 @@
+# 一键启动：docker compose up --build
+# 访问：http://localhost:8000
+services:
+  masking-workbench:
+    build: .
+    image: json-masking-workbench
+    container_name: json-masking-workbench
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      # 带盐哈希的默认盐：生产使用务必修改，可用 .env 文件注入
+      MASK_SALT: ${MASK_SALT:-please-change-me}
+      DATA_DIR: /data
+    volumes:
+      # 仅持久化规则模板（SQLite），原始数据从不落盘
+      - masking-templates:/data
+    restart: unless-stopped
+
+volumes:
+  masking-templates:

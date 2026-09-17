@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JSON 数据脱敏工作台</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="topbar">
+  <h1>🛡️ JSON 数据脱敏工作台</h1>
+  <span class="badge">本地运行 · 原始数据不落库 / 不写日志 / 不进导出清单</span>
+</header>
+
+<div class="toolbar">
+  <label>规则模板
+    <select id="templateSelect"><option value="">（未选择）</option></select>
+  </label>
+  <button id="btnLoadTemplate">加载</button>
+  <button id="btnSaveTemplate">保存模板</button>
+  <button id="btnSaveTemplateAs">另存为…</button>
+  <button id="btnDeleteTemplate" class="danger">删除模板</button>
+  <span class="spacer"></span>
+  <button id="btnSample">载入示例</button>
+  <button id="btnRun" class="primary">▶ 运行预览</button>
+  <button id="btnExportJson" disabled>导出脱敏 JSON</button>
+  <button id="btnExportAuditJson" disabled>审计清单 (JSON)</button>
+  <button id="btnExportAuditCsv" disabled>审计清单 (CSV)</button>
+</div>
+
+<main class="layout">
+  <section class="col">
+    <div class="panel">
+      <h2>① 原始 JSON</h2>
+      <div class="panel-actions">
+        <button id="btnFormat">格式化</button>
+        <button id="btnClear">清空</button>
+      </div>
+      <textarea id="jsonInput" spellcheck="false" placeholder='在此粘贴 JSON，例如 {"user":{"phone":"13800001111"}}'></textarea>
+      <div id="jsonError" class="error"></div>
+    </div>
+
+    <div class="panel">
+      <h2>② 脱敏规则 <small>（按优先级从小到大依次匹配；同一路径只执行首条命中规则）</small></h2>
+      <table class="rules-table">
+        <thead>
+          <tr>
+            <th>启用</th><th>优先级</th><th>名称</th><th>JSONPath</th>
+            <th>动作</th><th class="params-col">参数</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="rulesBody"></tbody>
+      </table>
+      <button id="btnAddRule">＋ 添加规则</button>
+    </div>
+  </section>
+
+  <section class="col">
+    <div class="panel">
+      <h2>③ 预览 <small>（左：原始 · 右：脱敏结果）</small></h2>
+      <div class="preview-grid">
+        <pre id="previewOriginal" class="json-view">（尚未运行）</pre>
+        <pre id="previewMasked" class="json-view">（尚未运行）</pre>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>④ 路径命中报告</h2>
+      <div class="panel-actions">
+        <label>筛选
+          <select id="reportFilter">
+            <option value="">全部</option>
+            <option value="matched">已命中</option>
+            <option value="unmatched">未命中</option>
+            <option value="skipped">已跳过（父节点被删）</option>
+          </select>
+        </label>
+        <span id="reportStats" class="muted"></span>
+      </div>
+      <div class="report-wrap">
+        <table class="report-table">
+          <thead>
+            <tr><th>路径</th><th>状态</th><th>命中规则</th><th>动作</th><th>原值</th><th>结果值</th></tr>
+          </thead>
+          <tbody id="reportBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="toast" class="toast hidden"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
